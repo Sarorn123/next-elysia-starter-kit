@@ -1,0 +1,28 @@
+{
+    "Index": {
+        "title": "សួរស្ដី",
+        "description": "ចាប់ផ្ដើម customize តាមចិត្ត"
+    },
+    "ResponseMessage": {
+        "NOT_FOUND": "រកមិនឃើញ",
+        "SUCCESS": "ជោគជ័យ",
+        "UNAUTHORIZED": "រកមិនឃើញអ្នកប្រើប្រាស់",
+        "EXISTED": "មានរួចហើយ"
+    },
+    "Dashboard": {
+        "Cards": {
+            "Income": {
+                "title": "ចំណូល",
+                "description": "ចំណូលថ្ងៃនេះ"
+            },
+            "Expense": {
+                "title": "ចំណាយ",
+                "description": "ចំណាយថ្ងៃនេះ"
+            },
+            "User": {
+                "title": "អ្នកប្រើប្រាស់",
+                "description": "អ្នកប្រើប្រាស់ System"
+            }
+        }
+    }
+}

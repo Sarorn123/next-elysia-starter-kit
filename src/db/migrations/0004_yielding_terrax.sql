@@ -1,0 +1,1 @@
+ALTER TABLE "user" ADD COLUMN "photo" varchar(255) DEFAULT '' NOT NULL;

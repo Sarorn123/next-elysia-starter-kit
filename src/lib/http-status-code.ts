@@ -1,0 +1,10 @@
+export const HTTP_CODE = {
+    UNAUTHORIZED: 401,
+    NOT_FOUND: 404,
+    OK: 200,
+    BAD_REQUEST: 400,
+    INTERNAL_SERVER_ERROR: 500,
+    CREATED: 201,
+    FORBIDDEN: 403,
+    CONFLICT: 409
+} as const

@@ -1,0 +1,28 @@
+{
+    "Index": {
+        "title": "Hello !",
+        "description": "Start customize whatever you want"
+    },
+    "ResponseMessage": {
+        "NOT_FOUND": "Not Found",
+        "SUCCESS": "Success",
+        "UNAUTHORIZED": "Unauthorized",
+        "EXISTED": "Existed"
+    },
+    "Dashboard": {
+        "Cards": {
+            "Income": {
+                "title": "Income",
+                "description": "Today's income"
+            },
+            "Expense": {
+                "title": "Expense",
+                "description": "Today's expense"
+            },
+            "User": {
+                "title": "User",
+                "description": "System user"
+            }
+        }
+    }
+}

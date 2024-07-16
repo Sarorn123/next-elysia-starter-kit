@@ -1,0 +1,15 @@
+services:
+  nextjs-elysia-db:
+    image: postgres
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: next-fullstack-db
+    volumes:
+      - next-elysia:/var/lib/postgresql/data
+    restart: always
+
+volumes:
+  next-elysia:
