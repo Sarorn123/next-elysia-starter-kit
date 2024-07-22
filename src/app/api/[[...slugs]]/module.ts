@@ -9,6 +9,10 @@ import { Scrypt } from "lucia";
 import { count } from 'drizzle-orm';
 import { userModule } from "./user";
 import { fileModule } from "./file";
+import { Resend } from "resend";
+import { generateOTP } from "@/helper"
+import { env } from "@/lib";
+import { sendOTP } from "@/lib/otp";
 
 async function validateSession(bearerSessionId?: string) {
     const sessionIdBearerId = lucia.readBearerToken(bearerSessionId ?? "");
@@ -25,14 +29,22 @@ export const appModule = new Elysia()
         }
     })
     .post("/register", async ({ body }) => {
-        const username = body.username
+
+        const email = body.email
         const password = body.password
-        const existed = await db.select({ count: count() }).from(userTable).where(eq(userTable.username, username))
+        const existed = await db.select({ count: count() }).from(userTable).where(eq(userTable.email, email))
         if (existed[0].count) throw new MYCUSTOMERROR("EXISTED")
+        const OTP = generateOTP()
+        await sendOTP(email, OTP)
         const scrypt = new Scrypt();
         const pass = await scrypt.hash(password);
         const id = generateId(15);
-        const inserted = await db.insert(userTable).values({ id, username, password: pass }).returning().catch(e => console.log(e))
+        const inserted = await db.insert(userTable).values({
+            id,
+            email,
+            password: pass,
+            otp: OTP
+        }).returning().catch(e => console.log(e))
         return {
             data: { inserted, },
             message: "SUCCESS"
@@ -40,7 +52,7 @@ export const appModule = new Elysia()
     },
         {
             body: t.Object({
-                username: t.String({
+                email: t.String({
                     minLength: 3
                 }),
                 password: t.String({
@@ -48,12 +60,45 @@ export const appModule = new Elysia()
                 }),
             })
         })
-    .post("/login", async ({ body }) => {
-        const username = body.username
+
+    .post("/verify-otp", async ({ body }) => {
         const user = await db.query.user.findFirst({
-            where: eq(userTable.username, username)
+            where: eq(userTable.email, body.email)
+        })
+        if (!user) throw new MYCUSTOMERROR("NOT_FOUND")
+        if (user.otp !== body.otp) throw new MYCUSTOMERROR("INVALID_OTP")
+        await db.update(userTable).set({
+            otp: ""
+        }).where(eq(userTable.email, body.email))
+        return {
+            message: "SUCCESS",
+        }
+    }, {
+        body: t.Object({
+            email: t.String({
+                minLength: 3
+            }),
+            otp: t.String({
+                minLength: 6
+            })
+        })
+    })
+    .post("/login", async ({ body }) => {
+        const email = body.email
+        const user = await db.query.user.findFirst({
+            where: eq(userTable.email, email)
         })
         if (!user) throw new MYCUSTOMERROR("UNAUTHORIZED")
+
+        if (user.otp) {
+            const newOTP = generateOTP()
+            await sendOTP(email, newOTP)
+            await db.update(userTable).set({
+                otp: newOTP
+            }).where(eq(userTable.email, email))
+            throw new MYCUSTOMERROR("INVALID_OTP")
+        }
+
         const scrypt = new Scrypt();
         const validPassword = await scrypt.verify(user.password, body.password)
         if (!validPassword) throw new MYCUSTOMERROR("UNAUTHORIZED")
@@ -63,7 +108,7 @@ export const appModule = new Elysia()
     },
         {
             body: t.Object({
-                username: t.String({
+                email: t.String({
                     minLength: 3
                 }),
                 password: t.String({
@@ -74,11 +119,11 @@ export const appModule = new Elysia()
     )
     .use(fileModule)
     .guard(
-        // {
-        //     headers: t.Object({
-        //         authorization: t.TemplateLiteral('Bearer ${string}')
-        //     })
-        // },
+        {
+            headers: t.Object({
+                authorization: t.TemplateLiteral('Bearer ${string}')
+            })
+        },
         (app) => app.resolve(async ({ headers: { authorization } }) => {
             return {
                 user: await validateSession(authorization)

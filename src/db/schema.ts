@@ -1,8 +1,8 @@
-import { integer, pgTable, serial, text, timestamp, varchar, date } from "drizzle-orm/pg-core";
+import { integer, pgTable, serial, text, timestamp, varchar, date, boolean } from "drizzle-orm/pg-core";
 
 export const user = pgTable("user", {
     id: text("id").primaryKey(),
-    username: varchar("username", { length: 255 }).notNull().unique(),
+    email: varchar("email", { length: 255 }).notNull().unique(),
     password: varchar("password", { length: 255 }).notNull(),
     position: varchar("position", { length: 255 }).default("manager"),
     age: varchar("age", { length: 255 }).default("18"),
@@ -11,7 +11,8 @@ export const user = pgTable("user", {
         withTimezone: true,
         mode: "date"
     }).defaultNow(),
-    photo: varchar("photo", { length: 1000 }).notNull().default("")
+    photo: varchar("photo", { length: 1000 }).notNull().default(""),
+    otp: varchar("otp").notNull().default(""),
 });
 
 export const session = pgTable("session", {

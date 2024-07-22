@@ -7,7 +7,8 @@
         "NOT_FOUND": "Not Found",
         "SUCCESS": "Success",
         "UNAUTHORIZED": "Unauthorized",
-        "EXISTED": "Existed"
+        "EXISTED": "Existed",
+        "INVALID_OTP": "Invalid OTP"
     },
     "Dashboard": {
         "Cards": {

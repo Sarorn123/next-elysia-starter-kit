@@ -4,97 +4,112 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { onLogin } from "../action";
+import { onLogin } from "../../../../action/auth";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Link } from "@/lib/navigation";
+import { Link, useRouter } from "@/lib/navigation";
 import { HTTP_CODE } from "@/lib/http-status-code";
 import { useResponseMessage } from "@/hook/helper";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { LoginSchema, loginSchema } from "@/schema-type/auth";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 export default function Login() {
   const message = useResponseMessage();
   const [loading, setLoading] = useState(false);
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const router = useRouter();
 
-  async function doLogin() {
+  const form = useForm<LoginSchema>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
+
+  async function doLogin(data: LoginSchema) {
     setLoading(true);
-    const response = await onLogin({ username, password });
+    const response = await onLogin(data);
     if (response.status === HTTP_CODE.OK) {
       toast.success(message(response.message));
+    } else if (response.status === HTTP_CODE.FORBIDDEN) {
+      router.push("/auth/otp?email=" + data.email);
     } else toast.error(message(response.message));
     setLoading(false);
   }
 
   return (
-    <div className="w-full lg:grid lg:min-h-[600px] lg:grid-cols-2 xl:min-h-[800px]">
-      <div className="flex items-center justify-center py-12">
-        <div className="mx-auto grid w-[350px] gap-6">
+    <div className="flex items-center justify-center py-12">
+      <Form {...form}>
+        <form
+          onSubmit={form.handleSubmit(doLogin)}
+          className="space-y-6mx-auto grid w-[350px] gap-6"
+        >
           <div className="grid gap-2 text-center">
             <h1 className="text-3xl font-bold">Login</h1>
             <p className="text-balance text-muted-foreground">
-              Login to your account just created 👌
+              Login with your account
             </p>
           </div>
           <div className="grid gap-4">
             <div className="grid gap-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="m@example.com"
-                required
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email</FormLabel>
+                    <FormControl>
+                      <Input
+                        id="email"
+                        type="email"
+                        placeholder="m@example.com"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
             </div>
             <div className="grid gap-2">
-              <div className="flex items-center">
-                <Label htmlFor="password">Password</Label>
-                <Link
-                  href="/forgot-password"
-                  className="ml-auto inline-block text-sm underline"
-                >
-                  Forgot your password?
-                </Link>
-              </div>
-              <Input
-                id="password"
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Password</FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        placeholder="A really complex password"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
             </div>
-            <Button
-              type="submit"
-              className="w-full"
-              disabled={loading}
-              onClick={doLogin}
-            >
+            <Button type="submit" className="w-full" disabled={loading}>
               Login
-            </Button>
-            <Button variant="outline" className="w-full">
-              Login with Google
             </Button>
           </div>
           <div className="mt-4 text-center text-sm">
-            Don&apos;t have an account?{" "}
+            don not have an account ?{" "}
             <Link href="/auth/signup" className="underline">
-              Sign up
+              Sign Up
             </Link>
           </div>
-        </div>
-      </div>
-      <div className="hidden bg-muted lg:block">
-        <Image
-          src="/vercel.svg"
-          alt="Image"
-          width="1920"
-          height="1080"
-          className="h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
-        />
-      </div>
+        </form>
+      </Form>
     </div>
   );
 }

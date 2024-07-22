@@ -13,7 +13,7 @@ const Header = async (props: Props) => {
     <section className="flex h-[50px] items-center justify-between border-b px-2">
       <h1>Logo</h1>
       <div className="flex items-center gap-2">
-        <p className="capitalize text-sm">{session?.username}</p>
+        <p className="capitalize text-sm">{session?.email}</p>
         <ThemeMode />
         <LangSwitcherSelect />
         <LogoutButton />

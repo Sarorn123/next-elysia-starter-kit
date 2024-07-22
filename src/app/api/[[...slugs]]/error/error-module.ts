@@ -22,6 +22,10 @@ export const errorModule = new Elysia({ name: "error" })
             set.status = HTTP_CODE.CONFLICT
             return { message }
         }
+        if (message === 'INVALID_OTP') {
+            set.status = HTTP_CODE.FORBIDDEN
+            return { message }
+        }
         if (message === 'UNAUTHORIZED') {
             set.status = HTTP_CODE.UNAUTHORIZED
             return { message }

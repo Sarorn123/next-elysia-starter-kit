@@ -1,6 +1,6 @@
 "use server";
 
-import { LoginSchema } from "@/schema-type/auth";
+import { LoginSchema, OTPSchema } from "@/schema-type/auth";
 import { HTTP_CODE } from "@/lib/http-status-code";
 import { redirect } from "@/lib/navigation";
 import { cookies } from "next/headers";
@@ -39,6 +39,21 @@ export async function onLogout() {
 
 export async function onRegister(body: LoginSchema) {
   const { data, error, status } = await ssrClient.api.register.post(body)
+  if (data) {
+    return {
+      message: data?.message,
+      status
+    }
+  }
+  const err = error as ElysiaErrorType
+  return {
+    message: err.value.message,
+    status
+  }
+}
+
+export async function otpAction(body: OTPSchema) {
+  const { data, error, status } = await ssrClient.api["verify-otp"].post(body)
   if (data) {
     return {
       message: data?.message,

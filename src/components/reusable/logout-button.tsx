@@ -8,7 +8,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { onLogout } from "@/app/[locale]/auth/action";
+import { onLogout } from "@/action/auth";
 
 type Props = {};
 

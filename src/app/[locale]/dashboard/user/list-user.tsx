@@ -19,6 +19,7 @@ import Image from "next/image";
 import UserDropdownMenu from "./dropdown-menu";
 import FilterUser from "./filter-user";
 import { UserQueryParams } from "@/schema-type/user";
+import { ShieldCheck, Ticket } from "lucide-react";
 
 type Props = {
   query: UserQueryParams;
@@ -43,7 +44,7 @@ const ListUser = async ({ query }: Props) => {
                   <span className="sr-only">Photo</span>
                   Photo
                 </TableHead>
-                <TableHead>Username</TableHead>
+                <TableHead>Email</TableHead>
                 <TableHead className="hidden md:table-cell">Age</TableHead>
                 <TableHead className="hidden md:table-cell">
                   Date Of Birth
@@ -60,7 +61,13 @@ const ListUser = async ({ query }: Props) => {
             <TableBody className="">
               {data?.data.map((user) => (
                 <TableRow key={user.id}>
-                  <TableCell className="hidden sm:table-cell">
+                  <TableCell className="hidden sm:table-cell relative">
+                    {!user.otp && (
+                      <ShieldCheck
+                        className="absolute top-0 left-0 text-primary"
+                        size={20}
+                      />
+                    )}
                     <Image
                       alt="Product image"
                       className="aspect-square rounded-md object-cover"
@@ -69,7 +76,7 @@ const ListUser = async ({ query }: Props) => {
                       width="64"
                     />
                   </TableCell>
-                  <TableCell className="font-medium">{user.username}</TableCell>
+                  <TableCell className="font-medium">{user.email}</TableCell>
                   <TableCell>{user.age}</TableCell>
                   <TableCell>{user.dob || "-"}</TableCell>
                   <TableCell>

@@ -78,7 +78,7 @@ const CreateUserTab = (props: Props) => {
   const form = useForm<CreateUserSchema>({
     resolver: zodResolver(createUserSchema),
     defaultValues: {
-      username: "",
+      email: "",
       password: "",
       age: "",
       dob: new Date(),
@@ -90,10 +90,10 @@ const CreateUserTab = (props: Props) => {
     if (id) {
       getSingleUser(id).then((data) => {
         if (data) {
-          const { age, dob, position, username, id, photo } = data.data;
+          const { age, dob, position, email, id, photo } = data.data;
           form.reset({
             id,
-            username,
+            email,
             age: age || "",
             dob: dob ? new Date(dob) : undefined,
             position: position || "",
@@ -189,12 +189,16 @@ const CreateUserTab = (props: Props) => {
 
                 <FormField
                   control={form.control}
-                  name="username"
+                  name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Username</FormLabel>
+                      <FormLabel>Email</FormLabel>
                       <FormControl>
-                        <Input placeholder="shadcn" {...field} />
+                        <Input
+                          placeholder="shadcn"
+                          {...field}
+                          readOnly={!!id}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

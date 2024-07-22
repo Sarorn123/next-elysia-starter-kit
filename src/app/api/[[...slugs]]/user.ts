@@ -8,6 +8,7 @@ import { Scrypt } from "lucia";
 import { generateId } from "lucia";
 import { deleteFile } from "@/lib/upload";
 import { count } from 'drizzle-orm';
+import { Resend } from 'resend';
 
 export const userModule = new Elysia({ prefix: "/user", name: "Service.User" })
     .get("/single", async ({ query, }) => {
@@ -32,7 +33,7 @@ export const userModule = new Elysia({ prefix: "/user", name: "Service.User" })
         const search = `%${query.search}%`
         const where = query.search ?
             or(
-                like(user.username, search),
+                like(user.email, search),
                 like(user.position, search),
                 like(user.age, search)
             ) : undefined
@@ -55,13 +56,14 @@ export const userModule = new Elysia({ prefix: "/user", name: "Service.User" })
     })
     .post("", async ({ body }) => {
 
-        const existed = await db.select({ id: user.id }).from(user).where(eq(userTable.username, body.username))
+        const email = body.email
+        const existed = await db.select({ id: user.id }).from(user).where(eq(userTable.email, email))
         if (existed[0] && existed[0].id !== body.id) throw new MYCUSTOMERROR("EXISTED")
         const scrypt = new Scrypt();
         const pass = await scrypt.hash(body.password);
         const id = generateId(15);
         const data = {
-            username: body.username,
+            email,
             password: body.password === "dummy" ? undefined : pass,
             position: body.position,
             age: body.age,
@@ -105,7 +107,7 @@ export const userModule = new Elysia({ prefix: "/user", name: "Service.User" })
     }, {
         body: t.Object({
             id: t.Optional(t.String()),
-            username: t.String({
+            email: t.String({
                 minLength: 3
             }),
             password: t.String({
@@ -149,7 +151,7 @@ export const userModule = new Elysia({ prefix: "/user", name: "Service.User" })
     .get("/dashboard", async ({ user }) => {
         return {
             data: {
-                userCount: (await db.select({ count: count() }).from(userTable).where(eq(userTable.id, user.id)))[0].count,
+                userCount: (await db.select({ count: count() }).from(userTable))[0].count,
                 income: "400,000",
                 expense: "200,000",
             }

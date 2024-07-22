@@ -7,7 +7,8 @@
         "NOT_FOUND": "រកមិនឃើញ",
         "SUCCESS": "ជោគជ័យ",
         "UNAUTHORIZED": "រកមិនឃើញអ្នកប្រើប្រាស់",
-        "EXISTED": "មានរួចហើយ"
+        "EXISTED": "មានរួចហើយ",
+        "INVALID_OTP": "លេខកូដមិនត្រឹមត្រូវ"
     },
     "Dashboard": {
         "Cards": {
